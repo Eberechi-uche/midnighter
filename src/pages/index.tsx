@@ -1,9 +1,9 @@
 import Head from "next/head";
 import Card from "@/components/Card/Card";
 import { useEffect, useState } from "react";
-import { Flex, Grid, filter } from "@chakra-ui/react";
+import { Flex, Grid, Stack } from "@chakra-ui/react";
 import FilterButtons from "@/components/Buttons/FilterButtons";
-
+import { Skeleton } from "@chakra-ui/react";
 type Data = {
   name: string;
   image: string;
@@ -28,6 +28,7 @@ export default function Home() {
   const [nft, setNft] = useState<Data[]>([]);
   const [filterValue, setFilterValue] = useState<string[]>([]);
   const [filteredNft, setFilteredNft] = useState<Data[]>([]);
+  const [loading, setLoading] = useState(true);
   const [options] = useState<string[]>([
     "Full greenhouse",
     "Perfect Ramen",
@@ -63,9 +64,10 @@ export default function Home() {
       )
         .then((response) => response.json())
         .then((data) => {
-          let filteredData = data.slice(0, 100);
+          let filteredData = data.slice(0, 300);
           setNft(filteredData as Data[]);
           setFilteredNft(filteredData);
+          setLoading(false);
         });
     } catch (error: any) {}
   }, []);
@@ -74,44 +76,32 @@ export default function Home() {
     filterValue.forEach((item) => {
       if (item === "Full greenhouse") {
         fullGreenHouse(nft, filtered);
-        return;
       } else if (item === "Perfect Ramen") {
         perfectRamen(nft, filtered);
-        return;
       } else if (item === "Brutalist Space") {
         BrutalistSpace(nft, filtered);
       } else if (item === "Full Underpass") {
         fullUnderpass(nft, filtered);
-        return;
       } else if (item === "The Real hidden denza") {
         realHiddenDenza(nft, filtered);
-        return;
       } else if (item === "Full Convience Store") {
         fullConvenienceStore(nft, filtered);
-        return;
       } else if (item === "Water Elements") {
         waterElement(nft, filtered);
-        return;
       } else if (item === "Cat's Dinner Bowl") {
         catsBowl(nft, filtered);
-        return;
       } else if (item === "Triple Pets") {
         TriplePets(nft, filtered);
-        return;
       } else if (item === "Public Transport") {
         publicTransport(nft, filtered);
-        return;
       } else if (item === "Tropical") {
         Tropical(nft, filtered);
-        return;
       }
     });
     setFilteredNft(filtered);
     if (filterValue.length === 0) {
       setFilteredNft(nft);
     }
-
-    console.log(filtered);
   }, [filterValue]);
   return (
     <>
@@ -146,6 +136,19 @@ export default function Home() {
             lg: "repeat(3, 1fr)",
           }}
         >
+          {loading && (
+            <>
+              {options.map((item, index) => (
+                <Skeleton
+                  startColor="orange.200"
+                  endColor="orange.500"
+                  height="250px"
+                  width={"100%"}
+                  key={index}
+                />
+              ))}
+            </>
+          )}
           {nft &&
             filteredNft.map((data) => (
               <Card name={data.name} image={data.image} key={data.id} />
@@ -155,6 +158,7 @@ export default function Home() {
     </>
   );
 }
+
 const fullGreenHouse = (array: Data[], filter: Data[]) => {
   let greenHouse = array.filter((Element: Data) => {
     return (
@@ -177,7 +181,6 @@ const perfectRamen = (array: Data[], filter: Data[]) => {
   perfectRamen.forEach((item) => {
     filter.push(item);
   });
-  console.log("perfect ramen");
 };
 const BrutalistSpace = (array: Data[], filter: Data[]) => {
   let BrutalistSpace = array.filter((Element: Data) => {
@@ -189,7 +192,6 @@ const BrutalistSpace = (array: Data[], filter: Data[]) => {
   BrutalistSpace.forEach((item) => {
     filter.push(item);
   });
-  console.log("perfect ramen");
 };
 const fullUnderpass = (array: Data[], filter: Data[]) => {
   let fullUnderpass = array.filter((Element: Data) => {

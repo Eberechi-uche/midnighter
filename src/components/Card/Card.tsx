@@ -1,41 +1,49 @@
-import { Flex, Text, Image, Icon } from "@chakra-ui/react";
+import { Flex, Text, Image, Skeleton } from "@chakra-ui/react";
+import { useState } from "react";
 
 type CardProps = {
   name: string;
   image: string;
 };
 const Card: React.FC<CardProps> = ({ name, image }) => {
+  const [imageLoad, setImageLoad] = useState(true);
   return (
     <>
       <Flex
         width={"fit-content"}
-        height={"max-content"}
         flexDir={"column"}
         position={"relative"}
         my={"7px"}
-        borderRadius={"10px"}
+        borderRadius={"4px"}
+        height={"fit-content"}
         overflow={"hidden"}
       >
         <Flex
           position={"absolute"}
           top={"0"}
           background={
-            "linear-gradient(0deg, rgba(34,193,195,0.616) 31%, rgba(223,158,17,0.5866666666666667) 60%)"
+            "linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(0,0,0,0.50) 100%)"
           }
           width={"100%"}
+          height={"40px"}
           color={"white"}
+          padding={"2"}
         >
           <Text fontWeight={"bold"}> MB </Text>
           <Text>{name} </Text>
         </Flex>
 
         <Flex>
-          <Image
-            src={image}
-            alt={"card image"}
-            width={"500px"}
-            objectFit={"scale-down"}
-          />
+          <Skeleton isLoaded={imageLoad}>
+            <Image
+              src={image}
+              alt={"card image"}
+              width={"500px"}
+              onLoad={() => setImageLoad(true)}
+              height={"250px"}
+              objectFit={"cover"}
+            />
+          </Skeleton>
         </Flex>
       </Flex>
     </>
