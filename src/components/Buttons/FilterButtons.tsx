@@ -15,7 +15,8 @@ const FilterButtons: React.FC<FilterButtonsProps> = ({
     <>
       <Flex m={"2"}>
         <Button
-          size={"sm"}
+          fontWeight={"thin"}
+          size={"md"}
           onClick={() => {
             filter(name);
           }}

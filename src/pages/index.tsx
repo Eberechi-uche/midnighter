@@ -1,10 +1,11 @@
 import Head from "next/head";
 import Card from "@/components/Card/Card";
 import { useEffect, useState } from "react";
-import { Flex, Grid, Stack } from "@chakra-ui/react";
+import { Button, Flex, Grid, Stack } from "@chakra-ui/react";
 import FilterButtons from "@/components/Buttons/FilterButtons";
+import Filter from "@/utilities/Filter";
 import { Skeleton } from "@chakra-ui/react";
-type Data = {
+export type Data = {
   name: string;
   image: string;
   attributes: {
@@ -25,9 +26,11 @@ type Data = {
   id: number;
 };
 export default function Home() {
+  const [allNft, setAllNft] = useState<Data[]>([]);
   const [nft, setNft] = useState<Data[]>([]);
   const [filterValue, setFilterValue] = useState<string[]>([]);
-  const [filteredNft, setFilteredNft] = useState<Data[]>([]);
+  const [paginatedNf, setpaginatedNf] = useState<Data[]>([]);
+  const [itemCount, setItemCount] = useState(10);
   const [loading, setLoading] = useState(true);
   const [options] = useState<string[]>([
     "Full greenhouse",
@@ -40,8 +43,20 @@ export default function Home() {
     "Full Convience Store",
     "Water Elements",
     "Cat's Dinner Bowl",
-    "Trible Pets",
+    "Triple Pets",
   ]);
+
+  const handlePagination = () => {
+    const newItem = nft.slice(itemCount, itemCount + 10);
+
+    if (filterValue.length) {
+      const result = Filter(filterValue, newItem);
+      setpaginatedNf((prev) => [...prev, ...result]);
+      return;
+    }
+    setpaginatedNf((prev) => [...prev, ...newItem]);
+    setItemCount((prev) => prev + 10);
+  };
 
   const handleFilter = (filterOption: string) => {
     const value = filterValue.find((element) => element === filterOption);
@@ -64,45 +79,24 @@ export default function Home() {
       )
         .then((response) => response.json())
         .then((data) => {
-          let filteredData = data.slice(0, 300);
+          let filteredData = data.slice(0, 50);
           setNft(filteredData as Data[]);
-          setFilteredNft(filteredData);
+          setAllNft(data as Data[]);
+          setpaginatedNf(filteredData.slice(0, 10));
           setLoading(false);
         });
     } catch (error: any) {}
   }, []);
   useEffect(() => {
-    let filtered: Data[] = [];
-    filterValue.forEach((item) => {
-      if (item === "Full greenhouse") {
-        fullGreenHouse(nft, filtered);
-      } else if (item === "Perfect Ramen") {
-        perfectRamen(nft, filtered);
-      } else if (item === "Brutalist Space") {
-        BrutalistSpace(nft, filtered);
-      } else if (item === "Full Underpass") {
-        fullUnderpass(nft, filtered);
-      } else if (item === "The Real hidden denza") {
-        realHiddenDenza(nft, filtered);
-      } else if (item === "Full Convience Store") {
-        fullConvenienceStore(nft, filtered);
-      } else if (item === "Water Elements") {
-        waterElement(nft, filtered);
-      } else if (item === "Cat's Dinner Bowl") {
-        catsBowl(nft, filtered);
-      } else if (item === "Triple Pets") {
-        TriplePets(nft, filtered);
-      } else if (item === "Public Transport") {
-        publicTransport(nft, filtered);
-      } else if (item === "Tropical") {
-        Tropical(nft, filtered);
-      }
-    });
-    setFilteredNft(filtered);
+    const result = Filter(filterValue, allNft);
+    setpaginatedNf(result.slice(0, 10));
+    setItemCount(10);
+    setNft(result);
     if (filterValue.length === 0) {
-      setFilteredNft(nft);
+      setpaginatedNf(allNft.slice(0, 10));
     }
   }, [filterValue]);
+
   return (
     <>
       <Head>
@@ -150,141 +144,26 @@ export default function Home() {
             </>
           )}
           {nft &&
-            filteredNft.map((data) => (
+            paginatedNf.map((data) => (
               <Card name={data.name} image={data.image} key={data.id} />
             ))}
         </Grid>
+        <Flex width={"100%"} py={"20px"} justify={"center"}>
+          <Button
+            width={{
+              base: "20%",
+              md: "7%",
+            }}
+            borderRadius={"full"}
+            colorScheme={"orange"}
+            fontWeight={"thin"}
+            onClick={handlePagination}
+            size={"md"}
+          >
+            more
+          </Button>
+        </Flex>
       </main>
     </>
   );
 }
-
-const fullGreenHouse = (array: Data[], filter: Data[]) => {
-  let greenHouse = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Architecture === "Greenhouse" &&
-      Element.attributes.Interior === "Overgrown"
-    );
-  });
-  greenHouse.forEach((item) => {
-    filter.push(item);
-  });
-};
-const perfectRamen = (array: Data[], filter: Data[]) => {
-  let perfectRamen = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Architecture === "Japanese Traditional" &&
-      Element.attributes.Interior === "Ramen Shop" &&
-      Element.attributes.Decoration === "Pork Noodles"
-    );
-  });
-  perfectRamen.forEach((item) => {
-    filter.push(item);
-  });
-};
-const BrutalistSpace = (array: Data[], filter: Data[]) => {
-  let BrutalistSpace = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Architecture === "Modern" &&
-      Element.attributes.Interior === "Space"
-    );
-  });
-  BrutalistSpace.forEach((item) => {
-    filter.push(item);
-  });
-};
-const fullUnderpass = (array: Data[], filter: Data[]) => {
-  let fullUnderpass = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Architecture === "Tokyo Street" &&
-      Element.attributes.Midground === "Industrial" &&
-      Element.attributes.Background === "Highway"
-    );
-  });
-  fullUnderpass.forEach((item) => {
-    filter.push(item);
-  });
-};
-const realHiddenDenza = (array: Data[], filter: Data[]) => {
-  let realHiddenDenza = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Architecture === "concrete denza" &&
-      Element.attributes.Car === "any tram"
-    );
-  });
-  realHiddenDenza.forEach((item) => {
-    filter.push(item);
-  });
-};
-const fullConvenienceStore = (array: Data[], filter: Data[]) => {
-  let ConvienceStore = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Interior === "Midnight Breeze Shop" &&
-      Element.attributes.Architecture === "Convenience Store" &&
-      Element.attributes.Decoration === "GM Shop"
-    );
-  });
-  ConvienceStore.forEach((item) => {
-    filter.push(item);
-  });
-};
-const waterElement = (array: Data[], filter: Data[]) => {
-  let waterElement = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Interior === "Fish Bowl" &&
-      Element.attributes.Architecture === "Concrete Wave" &&
-      (Element.attributes.Background === "Beach" ||
-        Element.attributes.Background === "Island Sea")
-    );
-  });
-  waterElement.forEach((item) => {
-    filter.push(item);
-  });
-};
-const catsBowl = (array: Data[], filter: Data[]) => {
-  let catsBowl = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Interior === "Fish Bowl" &&
-      Element.attributes["Sky Element"] === "Cat Kami"
-    );
-  });
-  catsBowl.forEach((item) => {
-    filter.push(item);
-  });
-};
-const TriplePets = (array: Data[], filter: Data[]) => {
-  let TriplePets = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Interior === "Tatami Shiba Cat" &&
-      (Element.attributes.Character === "Bus Stop" ||
-        Element.attributes.Character === "Samu Frogs")
-    );
-  });
-  TriplePets.forEach((item) => {
-    filter.push(item);
-  });
-};
-const publicTransport = (array: Data[], filter: Data[]) => {
-  let publicTransport = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Foreground === "Train Light" &&
-      Element.attributes.Car === "Tram/Tram Pink/Tram Green/Tram Tagged" &&
-      Element.attributes.Character === "Bus Stop"
-    );
-  });
-  publicTransport.forEach((item) => {
-    filter.push(item);
-  });
-};
-const Tropical = (array: Data[], filter: Data[]) => {
-  let tropical = array.filter((Element: Data) => {
-    return (
-      Element.attributes.Midground === "Palms" &&
-      (Element.attributes.Background === "Beach" ||
-        Element.attributes.Background === "Island Sea")
-    );
-  });
-  tropical.forEach((item) => {
-    filter.push(item);
-  });
-};

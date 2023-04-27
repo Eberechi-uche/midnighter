@@ -21,9 +21,7 @@ const Card: React.FC<CardProps> = ({ name, image }) => {
         <Flex
           position={"absolute"}
           top={"0"}
-          background={
-            "linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(0,0,0,0.50) 100%)"
-          }
+          background={"linear-gradient(to  bottom, #232526, #4143452c);"}
           width={"100%"}
           height={"40px"}
           color={"white"}
